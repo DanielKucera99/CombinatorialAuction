@@ -46,8 +46,6 @@ def compute_composite_score(task, member):
     member_name = team_members[member]['name']
     if task in team_members[member]['preferences']:
         score += team_members[member]['preferences'][task]
-    luck = rand.random()
-    score *= luck
     if task == "Front-end Development" or task == "Back-end Development":
         for skill in ["Java", "Spring"]:
             skill_level = team_members[member]['skills'].get(skill, "None")
@@ -82,12 +80,15 @@ def compute_composite_score(task, member):
                         skill_score -= 10
                     elif level == "Beginner":
                         skill_score -= 20
+
     score += skill_score
     score += possible_tasks[task]
+    luck = rand.random()
+    score *= luck
 
     if member_name not in skill_scores:
-        skill_scores[member_name] = {}  # Initialize an empty dictionary for the member if not present
-    skill_scores[member_name][task] = skill_score  # Store the skill score for the task
+        skill_scores[member_name] = {}
+    skill_scores[member_name][task] = skill_score
 
     return score
 
@@ -140,7 +141,7 @@ def plot_member_scores(member_index):
 
     colors = ['blue' if task not in allocated_tasks else 'red' for task in possible_tasks]
 
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(14, 6))
     plt.barh(list(possible_tasks.keys()), member_scores, color=colors)
     plt.xlabel('Score')
     plt.ylabel('Task')
@@ -151,20 +152,17 @@ def plot_member_scores(member_index):
 for i in range(len(team_members)):
     plot_member_scores(i)
 
-# Create a Tkinter window
 window = tk.Tk()
 window.title("Skills, Preferences, and Scores")
 
-# Create a frame to hold the content
 frame = tk.Frame(window)
 frame.pack(padx=10, pady=10)
 
 
 def display_skills_preferences_scores():
-    # Display task values
     for i, (task, value) in enumerate(possible_tasks.items()):
         task_label = tk.Label(frame, text=f"Task: {task}, Value: {value}")
-        task_label.grid(row=i, column=8, sticky="w", padx=5, pady=2)  # Adjust padding here
+        task_label.grid(row=i, column=8, sticky="w", padx=5, pady=2)
 
     for i, member in enumerate(team_members):
         member_label = tk.Label(frame, text=f"Member: {member['name']}")
@@ -175,28 +173,28 @@ def display_skills_preferences_scores():
 
         for j, (task, preference) in enumerate(member['preferences'].items()):
             preference_label = tk.Label(frame, text=f"- {task}: Preference {preference}")
-            preference_label.grid(row=i * 5 + 1 + j, column=3, sticky="w", padx=5, pady=2)  # Adjust padding here
+            preference_label.grid(row=i * 5 + 1 + j, column=3, sticky="w", padx=5, pady=2)
 
         tasks_label = tk.Label(frame, text="Allocated Tasks:")
         tasks_label.grid(row=i * 5 + 1, column=4, sticky="w")
 
+        allocated_row = i * 5 + 2
         for j, task in enumerate(tasks[i]):
             if task:
                 task_score = points[i][j]
                 task_label = tk.Label(frame, text=f"- {task}: Score {task_score}")
-                task_label.grid(row=i * 5 + 1 + j, column=5, sticky="w", padx=5, pady=2)  # Adjust padding here
+                task_label.grid(row=allocated_row, column=5, sticky="w", padx=5, pady=2)
+                allocated_row += 1
 
         skill_scores_label = tk.Label(frame, text="Skill Scores:")
         skill_scores_label.grid(row=i * 5 + 1, column=6, sticky="w")
 
         for j, (task, score) in enumerate(skill_scores[member['name']].items()):
             skill_score_label = tk.Label(frame, text=f"- {task}: Skill Score {score}")
-            skill_score_label.grid(row=i * 5 + 1 + j, column=7, sticky="w", padx=5, pady=2)  # Adjust padding here
+            skill_score_label.grid(row=i * 5 + 1 + j, column=7, sticky="w", padx=5, pady=2)
 
 
 display_skills_preferences_scores()
 
 window.mainloop()
-
-
 
