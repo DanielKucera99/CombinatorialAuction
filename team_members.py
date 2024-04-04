@@ -75,11 +75,11 @@ def compute_composite_score(task, member):
             for skill, skill_level in team_members[member]['skills'].items():
                 if skill_level == level:
                     if level == "Advanced":
-                        skill_score -= 5
+                        skill_score -= 20
                     elif level == "Intermediate":
                         skill_score -= 10
                     elif level == "Beginner":
-                        skill_score -= 20
+                        skill_score -= 5
 
     score += skill_score
     score += possible_tasks[task]
@@ -93,7 +93,10 @@ def compute_composite_score(task, member):
     return score
 
 
-prob += lpSum(compute_composite_score(task, member) * x[task, member]
+composite_scores = {(task, member): compute_composite_score(task, member)
+                    for task in possible_tasks
+                    for member in range(len(team_members))}
+prob += lpSum(composite_scores[task, member] * x[task, member]
               for task in possible_tasks
               for member in range(len(team_members)))
 
@@ -124,7 +127,7 @@ for member in team_members:
             if value(x[task, member_idx]) == 1 and team_members[member_idx]['name'] == member_name:
                 assigned = True
                 member_tasks.append(task)
-                member_points.append(compute_composite_score(task, member_idx))
+                member_points.append(composite_scores[task, member_idx])
                 break
         if not assigned:
             member_tasks.append(None)
@@ -136,7 +139,8 @@ for member in team_members:
 def plot_member_scores(member_index):
     member = team_members[member_index]
     members_name = member['name']
-    member_scores = [compute_composite_score(task, member_index) for task in possible_tasks]
+    member_scores = [composite_scores[task, member_index] for task in possible_tasks]
+    print(f"Member scores: {member_scores}")
     allocated_tasks = [task for task in possible_tasks if value(x[task, member_index]) == 1]
 
     colors = ['blue' if task not in allocated_tasks else 'red' for task in possible_tasks]
