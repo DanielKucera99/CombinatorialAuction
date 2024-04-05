@@ -70,7 +70,7 @@ def compute_composite_score(task, member):
         for skill, level in team_members[member]['skills'].items():
             if skill not in ["SQL"]:
                 skill_score += 5
-    elif task == "Testing" or "Documentation" or "Debugging":
+    elif task == "Testing" or task == "Documentation" or task == "Debugging":
         for level in ["Advanced", "Intermediate", "Beginner"]:
             for skill, skill_level in team_members[member]['skills'].items():
                 if skill_level == level:
@@ -83,6 +83,8 @@ def compute_composite_score(task, member):
 
     score += skill_score
     score += possible_tasks[task]
+    if score == 0:
+        score = 1
     luck = rand.random()
     score *= luck
 
@@ -170,19 +172,19 @@ def display_skills_preferences_scores():
 
     for i, member in enumerate(team_members):
         member_label = tk.Label(frame, text=f"Member: {member['name']}")
-        member_label.grid(row=i * 5, column=0, sticky="w")
+        member_label.grid(row=i * 7, column=0, sticky="w")
 
         preferences_label = tk.Label(frame, text="Preferences:")
-        preferences_label.grid(row=i * 5 + 1, column=2, sticky="w")
+        preferences_label.grid(row=i * 7 + 1, column=2, sticky="w")
 
         for j, (task, preference) in enumerate(member['preferences'].items()):
             preference_label = tk.Label(frame, text=f"- {task}: Preference {preference}")
-            preference_label.grid(row=i * 5 + 1 + j, column=3, sticky="w", padx=5, pady=2)
+            preference_label.grid(row=i * 7 + 2 + j, column=3, sticky="w", padx=5, pady=2)
 
         tasks_label = tk.Label(frame, text="Allocated Tasks:")
-        tasks_label.grid(row=i * 5 + 1, column=4, sticky="w")
+        tasks_label.grid(row=i * 7 + 1, column=4, sticky="w")
 
-        allocated_row = i * 5 + 2
+        allocated_row = i * 7 + 2
         for j, task in enumerate(tasks[i]):
             if task:
                 task_score = points[i][j]
@@ -191,14 +193,15 @@ def display_skills_preferences_scores():
                 allocated_row += 1
 
         skill_scores_label = tk.Label(frame, text="Skill Scores:")
-        skill_scores_label.grid(row=i * 5 + 1, column=6, sticky="w")
+        skill_scores_label.grid(row=i * 7 + 1, column=6, sticky="w")
 
         for j, (task, score) in enumerate(skill_scores[member['name']].items()):
             skill_score_label = tk.Label(frame, text=f"- {task}: Skill Score {score}")
-            skill_score_label.grid(row=i * 5 + 1 + j, column=7, sticky="w", padx=5, pady=2)
+            skill_score_label.grid(row=i * 7 + 2 + j, column=7, sticky="w", padx=5, pady=2)
 
 
 display_skills_preferences_scores()
+
 
 window.mainloop()
 
